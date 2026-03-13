@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% load file_filters %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<p>Welcome, {{ user.username }}!</p>
+
+<h2>Navigation</h2>
+<ul>
+    <li><a href="#">My Projects</a></li>
+    <li><a href="{% url 'uploads:upload' %}">Upload File</a></li>
+</ul>
+
+<h3>Your Uploaded Files</h3>
+
+{% if files %}
+<table border="1">
+    <tr>
+        <th>Filename</th>
+        <th>Size</th>
+        <th>Uploaded</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for file in files %}
+    <tr>
+        <td>{{ file.original_filename }}</td>
+        <td>{{ file.file_size|filesize }}</td>
+        <td>{{ file.uploaded_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ file.status }}</td>
+
+        <td>
+            <form method="post" action="{% url 'uploads:delete_file' file.id %}">
+                {% csrf_token %}
+                <button onclick="return confirm('Delete this file?')">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Pagination goes HERE -->
+<div style="margin-top:20px;">
+
+{% if files.has_previous %}
+    <a href="?page=1">First</a>
+    <a href="?page={{ files.previous_page_number }}">Previous</a>
+{% endif %}
+
+Page {{ files.number }} of {{ files.paginator.num_pages }}
+
+{% if files.has_next %}
+    <a href="?page={{ files.next_page_number }}">Next</a>
+    <a href="?page={{ files.paginator.num_pages }}">Last</a>
+{% endif %}
+
+</div>
+
+{% else %}
+
+<p>You haven't uploaded any files yet.</p>
+
+{% endif %}
+
+{% endblock %}

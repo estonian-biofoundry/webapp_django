@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Home — StrainQC{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to StrainQC</h1>
+
+<p>
+    A platform for managing and analyzing microbial strain sequencing data.
+</p>
+
+<hr>
+
+<h2>Features</h2>
+
+<ul>
+    <li>Upload sequencing files securely</li>
+    <li>Organize projects and samples</li>
+    <li>Track processing history</li>
+    <li>Generate quality reports</li>
+</ul>
+
+<br>
+
+{% if not user.is_authenticated %}
+    <a class="btn btn-primary" href="{% url 'accounts:signup' %}">Get Started</a>
+{% else %}
+    <a class="btn btn-success" href="{% url 'dashboard:dashboard' %}">Go to Dashboard</a>
+{% endif %}
+
+{% endblock %}

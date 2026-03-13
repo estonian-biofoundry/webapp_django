@@ -124,3 +124,5 @@ delete everything from the app folder/migrations except the empty init file
 and then delete everything from django_migrations table in db
 
 - DELETE FROM django_migrations WHERE app='appname';
+
+this change comes from feature git-learning

@@ -126,3 +126,9 @@ and then delete everything from django_migrations table in db
 - DELETE FROM django_migrations WHERE app='appname';
 
 this change comes from feature git-learning
+
+> [!TIP]
+> ❌
+> [![please replace with alt text](https://img.shields.io/badge/anytext-youlike-blue)](https://example.org)
+
+Add TOC in read me

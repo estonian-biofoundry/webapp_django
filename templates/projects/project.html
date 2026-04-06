@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Create New Project</h3>
+<h5>You can choose from one of two pipelines below</h5>
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% endif %}
+
+<p><strong>Timepoint Pipeline:</strong> Select one CSV file. Column names must match exactly (case-sensitive) for group, dose, OD, and time fields.</p>
+<p><strong>Sequence Pipeline:</strong> Select one reference file (FASTA) and one or two read files (FASTQ).</p>
+
+<p>Note: To successfully create a project, you must have file/s uploaded first. To upload files go to <a href="{% url 'uploads:upload' %}">Upload Files</a></p>
+
+<hr>
+
+<!-- TIMEPOINT PIPELINE -->
+<div style="border:1px solid #ccc; padding:15px; margin-bottom:20px;">
+<h4>Timepoint Pipeline</h4>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="pipeline" value="TIMEPOINT">
+
+    <label for="timepoint_file">Select File:</label>
+    <select name="timepoint_file" required>
+        <option value="" disabled selected>Select a file</option>
+        {% for file in user_files %}
+            <option value="{{ file.id }}">{{ file.original_filename }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="group_fields">Group Fields (comma-separated):</label>
+    <input type="text" name="group_fields" placeholder="Species, Treatment" 
+           value="{{ request.POST.group_fields }}">
+    <br><br>
+
+    <label for="dose_field">Dose Field:</label>
+    <input type="text" name="dose_field" placeholder="Dose" value="{{ request.POST.dose_field }}">
+    <br><br>
+
+    <label for="od_field">OD Field:</label>
+    <input type="text" name="od_field" placeholder="RawOD" value="{{ request.POST.od_field }}">
+    <br><br>
+
+    <label for="time_field">Time Field:</label>
+    <input type="text" name="time_field" placeholder="Time" value="{{ request.POST.time_field }}">
+    <br><br>
+
+    <button type="submit">Create Timepoint Project</button>
+</form>
+</div>
+
+<!-- SEQUENCE PIPELINE -->
+<div style="border:1px solid #ccc; padding:15px; margin-bottom:20px;">
+<h4>Sequence Pipeline</h4>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="pipeline" value="SEQUENCE">
+
+    <label for="ref_file">Reference File:</label>
+    <select name="ref_file" required>
+        <option value="" disabled selected>Select reference file</option>
+        {% for file in user_files %}
+            <option value="{{ file.id }}">{{ file.original_filename }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="read_files">Read Files (select 1 or 2):</label>
+    <small style="color:gray;">Use Ctrl / Cmd to select multiple files</small>
+    <select name="read_files" multiple size="5" required>
+        {% for file in user_files %}
+            <option value="{{ file.id }}">{{ file.original_filename }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <button type="submit">Create Sequence Project</button>
+</form>
+</div>
+
+{% endblock %}

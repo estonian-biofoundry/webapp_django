@@ -10,7 +10,7 @@ def generate_upload_id():
 
 # to generate file path for uploaded files, we can use the upload_id to create a unique folder for each upload
 def upload_file_path(instance, filename):
-    return f"media/{instance.upload_id}/{filename}"
+    return f"{instance.upload_id}/{filename}"
 
 
 class File(models.Model):

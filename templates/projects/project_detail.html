@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<h2>Project: {{ project.project_id }}</h2>
+<p>Status: {{ project.status }}</p>
+
+{% if project.error_message %}
+  <p style="color:red;">Error: {{ project.error_message }}</p>
+{% endif %}
+
+{% if result %}
+  <h3>Result</h3>
+  <pre>{{ result.result_json }}</pre>
+{% else %}
+  <p>No result yet.</p>
+{% endif %}
+
+
+{% endblock %}

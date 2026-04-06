@@ -29,38 +29,26 @@ Template: templates/dashboard/
 ✅ Achievements So Far
 
 Fully functional File model: Fields: upload_id, user, file, original_filename, file_size, status, uploaded_at, md5
-
 CRUD-based file upload with Django ORM (no ModelForm required)
-
 MD5 calculation & file validation (size + optional allowed types)
-
 Pagination of user files using Django Paginator
-
 Template tags for formatting file size (|filesize)
-
 Base template (base.html) with consistent navigation
-
-Dashboard shows user files, pagination, and file stats
-
 Business logic separated into utils.py for reusability
-
 Solid understanding of views, templates, and QuerySets
+Dashboard shows user files, pagination, and file stats
+Dashboard also shows file count and total storage used and sorting by filename
+Dashboard has functionality of delete button and deleting it deletes the DB row as well as physical file. so basic concept of signals is covered
+Dashboard has a secured download endpoint where only user can download its file and view its files. Admin/superuser can view all the files
 
 🚀 Near-Term Goals / Roadmap
-
-1. Dashboard Improvements
-   Display file count & total storage used
-   Sorting files by upload date, size, or filename
-   Delete files (DB row + physical file)
-   Optional: secure file download endpoint (owner-only)
 
 2. Uploads Enhancements
    Handle large files (chunked or async uploads)
    Streaming upload/download
    Optional: switch storage backend to S3
 
-3. Signals & Cleanup
-   Use Django signals to delete physical files when a File row is deleted
+3. Signals
    Optional: signal to update dashboard stats automatically
 
 4. Projects & Pipelines (Future)

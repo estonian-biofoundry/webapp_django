@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home_view, name="home"),
     path("accounts/", include("accounts.urls")),
-    path("files/", include("uploads.urls")),  # new uploads app
+    path("uploads/", include("uploads.urls")),  # new uploads app
     path("dashboard/", include("dashboard.urls")),  # new dashboard app
+    path("projects/", include("projects.urls")),  # new projects app
 ]

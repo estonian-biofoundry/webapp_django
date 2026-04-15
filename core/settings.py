@@ -150,3 +150,14 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # MEDIA CONFIGURATION
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
+
+
+# CELERY CONFIGURATION
+CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_RESULT_BACKEND = (
+    "redis://localhost:6379/2"  # store results in a separate Redis DB
+)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"

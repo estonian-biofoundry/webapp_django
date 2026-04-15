@@ -7,6 +7,21 @@
 {% block content %}
 
 <h2>Dashboard</h2>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+<div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 10px;">
+    <strong>Error:</strong> {{ message }}
+</div>
+{% else %}
+<div style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 10px;">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
 <p>Welcome, {{ user.username }}!</p>
 
 <!-- Navigation -->
@@ -27,11 +42,11 @@
         <tr>
             <th>Project ID</th>
             <th>Pipeline</th>
-            <th>Created</th>
+            <th>Created (UTC)</th>
             <th>Created by</th>
             <th>Status</th>
             <th>Files</th>
-            <th>Completed at</th>
+            <th>Completed (UTC)</th>
             <th>Actions</th>
         </tr>
 
@@ -43,9 +58,9 @@
             <td>{{ project.user.username }}</td>
             <td>
                 {% if project.status == "FAILED" %}
-                    <span style="color:red;"><strong>{{ project.status }}</strong></span>
+                <span style="color:red;"><strong>{{ project.status }}</strong></span>
                 {% else %}
-                    {{ project.status }}
+                {{ project.status }}
                 {% endif %}
             </td>
             <td>{{ project.file_names|default:"No files" }}</td>
@@ -58,12 +73,26 @@
                 </form>
 
                 <!-- View button -->
-                {% if project.status == "SUCCESS" %}
-                    <a href="{% url 'projects:project_detail' project.id %}">
-                        <button type="button">View results</button>
-                    </a>
-                {% else %}
-                    <button type="button" disabled style="opacity:0.5;">View results</button>
+                <a href="{% url 'projects:project_detail' project.id %}">
+                    {% if project.status == "FAILED" %}
+                    <button type="button" style="color:red;">View details</button>
+                    {% elif project.status == "SUCCESS" %}
+                    <button type="button">View details</button>
+                    {% else %}
+                    <button type="button" disabled style="opacity:0.5;">View details</button>
+                    {% endif %}
+                </a>
+
+                <!-- Delete button (Admin/Superuser only) -->
+                {% if user.is_superuser %}
+                <form method="post" action="{% url 'dashboard:delete_project' project.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                        onclick="return confirm('Are you sure you want to delete project {{ project.project_id }}? This cannot be undone.');"
+                        style="color:red;">
+                        Delete
+                    </button>
+                </form>
                 {% endif %}
             </td>
         </tr>
@@ -100,7 +129,7 @@
             <th><a href="?sort=upload_id">Upload ID</a></th>
             <th><a href="?sort=original_filename">Filename</a></th>
             <th><a href="?sort=file_size">Size</a></th>
-            <th><a href="?sort=uploaded_at">Uploaded</a></th>
+            <th><a href="?sort=uploaded_at">Uploaded (UTC)</a></th>
             <th>Uploaded by</th>
             <th>Actions</th>
         </tr>
@@ -128,15 +157,15 @@
     <!-- Pagination -->
     <div style="margin-top:20px;">
         {% if files.has_previous %}
-            <a href="?page=1&sort={{ request.GET.sort }}">First</a>
-            <a href="?page={{ files.previous_page_number }}&sort={{ request.GET.sort }}">Previous</a>
+        <a href="?page=1&sort={{ request.GET.sort }}">First</a>
+        <a href="?page={{ files.previous_page_number }}&sort={{ request.GET.sort }}">Previous</a>
         {% endif %}
 
         Page {{ files.number }} of {{ files.paginator.num_pages }}
 
         {% if files.has_next %}
-            <a href="?page={{ files.next_page_number }}&sort={{ request.GET.sort }}">Next</a>
-            <a href="?page={{ files.paginator.num_pages }}&sort={{ request.GET.sort }}">Last</a>
+        <a href="?page={{ files.next_page_number }}&sort={{ request.GET.sort }}">Next</a>
+        <a href="?page={{ files.paginator.num_pages }}&sort={{ request.GET.sort }}">Last</a>
         {% endif %}
     </div>
 

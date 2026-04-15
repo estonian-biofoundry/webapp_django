@@ -24,7 +24,11 @@ class File(models.Model):
     id = models.BigAutoField(primary_key=True)
 
     upload_id = models.CharField(
-        max_length=20, unique=True, default=generate_upload_id, editable=False
+        max_length=20,
+        unique=True,
+        default=generate_upload_id,
+        editable=False,
+        db_collation="C",
     )
     # foreign key automatically adds _id in the database, so we just call it user
     user = models.ForeignKey(User, on_delete=models.CASCADE)

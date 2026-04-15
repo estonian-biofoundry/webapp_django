@@ -26,6 +26,10 @@ The subfolder **core** contains following files
 
 - python manage.py runserver 127.0.0.1:8003
 
+If uvicorn installed, then
+
+- uvicorn core.asgi:application --host 127.0.0.1 --port 8003 --reload
+
 ### setup a dev db first
 
 - create **strainqc_dev** database
@@ -132,3 +136,43 @@ this change comes from feature git-learning
 > [![please replace with alt text](https://img.shields.io/badge/anytext-youlike-blue)](https://example.org)
 
 Add TOC in read me
+
+### setting up celery
+
+1. installation
+   pip install celery redis (install redis server sepearately on ur OS)
+   create a file in your core/settings folder called celery.py (put the name of project in i.e. core.settings and app=Celery("core"))
+
+```python
+import os
+from celery import Celery
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+app = Celery("core")
+app.config_from_object("django.conf:settings", namespace="CELERY")
+app.autodiscover_tasks()
+```
+
+2. Celery config to settings.py
+   Open core/settings.py and add this to the end. the ending part of URL will define which db to use (since zero was already in use by labid hence 1)
+
+```python
+# settings.py
+CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/2"  # store results in a separate Redis DB
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+```
+
+3. Finally add the following to core/**init**.py
+
+```python
+from .celery import app as celery_app
+__all__ = ("celery_app",)
+```
+
+now run celery worker 
+celery -A core worker -l info
+
+, now all your functions which have the proerty shared_task and .delay() will go to scheduler to run async instead of blocking the workflow

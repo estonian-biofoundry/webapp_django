@@ -1,6 +1,5 @@
 name: Django CI
 
-# Trigger: runs when we push to dev or open/update PR to dev
 on:
   push:
     branches: [dev]
@@ -11,25 +10,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      ENV: ci   # for git actions
+
     steps:
-      # Step 1: Get code from the repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Step 4: Run Django system checks
       - name: Run Django checks
         run: python manage.py check
 
-      # Step 5: Run tests (optional if you have them)
       - name: Run tests
         run: python manage.py test

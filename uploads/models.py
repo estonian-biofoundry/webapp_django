@@ -10,7 +10,7 @@ def generate_upload_id():
 
 # to generate file path for uploaded files, we can use the upload_id to create a unique folder for each upload
 def upload_file_path(instance, filename):
-    return f"media/{instance.upload_id}/{filename}"
+    return f"{instance.upload_id}/{filename}"
 
 
 class File(models.Model):
@@ -24,7 +24,11 @@ class File(models.Model):
     id = models.BigAutoField(primary_key=True)
 
     upload_id = models.CharField(
-        max_length=20, unique=True, default=generate_upload_id, editable=False
+        max_length=20,
+        unique=True,
+        default=generate_upload_id,
+        editable=False,
+        db_collation="C",
     )
     # foreign key automatically adds _id in the database, so we just call it user
     user = models.ForeignKey(User, on_delete=models.CASCADE)

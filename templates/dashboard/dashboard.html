@@ -5,66 +5,174 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
+
+<h2>Dashboard</h2>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+<div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 10px;">
+    <strong>Error:</strong> {{ message }}
+</div>
+{% else %}
+<div style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 10px;">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
 
 <p>Welcome, {{ user.username }}!</p>
 
-<h2>Navigation</h2>
-<ul>
-    <li><a href="#">My Projects</a></li>
-    <li><a href="{% url 'uploads:upload' %}">Upload File</a></li>
-</ul>
+<!-- Navigation -->
+<p>
+    <a href="{% url 'projects:create' %}">Create Project</a> |
+    <a href="{% url 'uploads:upload' %}">Upload File</a>
+</p>
 
-<h3>Your Uploaded Files</h3>
+<hr>
 
-{% if files %}
-<table border="1">
-    <tr>
-        <th>Filename</th>
-        <th>Size</th>
-        <th>Uploaded</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
+<!-- Projects Section -->
+<details open>
+    <summary><strong>Projects</strong></summary>
+    <br>
 
-    {% for file in files %}
-    <tr>
-        <td>{{ file.original_filename }}</td>
-        <td>{{ file.file_size|filesize }}</td>
-        <td>{{ file.uploaded_at|date:"Y-m-d H:i" }}</td>
-        <td>{{ file.status }}</td>
+    {% if projects %}
+    <table border="1">
+        <tr>
+            <th>Project ID</th>
+            <th>Pipeline</th>
+            <th>Created (UTC)</th>
+            <th>Created by</th>
+            <th>Status</th>
+            <th>Files</th>
+            <th>Completed (UTC)</th>
+            <th>Actions</th>
+        </tr>
 
-        <td>
-            <form method="post" action="{% url 'uploads:delete_file' file.id %}">
-                {% csrf_token %}
-                <button onclick="return confirm('Delete this file?')">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        {% for project in projects %}
+        <tr>
+            <td>{{ project.project_id }}</td>
+            <td>{{ project.pipeline }}</td>
+            <td>{{ project.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ project.user.username }}</td>
+            <td>
+                {% if project.status == "FAILED" %}
+                <span style="color:red;"><strong>{{ project.status }}</strong></span>
+                {% else %}
+                {{ project.status }}
+                {% endif %}
+            </td>
+            <td>{{ project.file_names|default:"No files" }}</td>
+            <td>{{ project.completed_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <!-- Run button -->
+                <form method="post" action="{% url 'projects:run' project.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Run</button>
+                </form>
 
-<!-- Pagination goes HERE -->
-<div style="margin-top:20px;">
+                <!-- View button -->
+                <a href="{% url 'projects:project_detail' project.id %}">
+                    {% if project.status == "FAILED" %}
+                    <button type="button" style="color:red;">View details</button>
+                    {% elif project.status == "SUCCESS" %}
+                    <button type="button">View details</button>
+                    {% else %}
+                    <button type="button" disabled style="opacity:0.5;">View details</button>
+                    {% endif %}
+                </a>
 
-{% if files.has_previous %}
-    <a href="?page=1">First</a>
-    <a href="?page={{ files.previous_page_number }}">Previous</a>
-{% endif %}
+                <!-- Delete button (Admin/Superuser only) -->
+                {% if user.is_superuser %}
+                <form method="post" action="{% url 'dashboard:delete_project' project.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                        onclick="return confirm('Are you sure you want to delete project {{ project.project_id }}? This cannot be undone.');"
+                        style="color:red;">
+                        Delete
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
-Page {{ files.number }} of {{ files.paginator.num_pages }}
+    {% else %}
+    <p>No project has been created yet.</p>
+    {% endif %}
+</details>
 
-{% if files.has_next %}
-    <a href="?page={{ files.next_page_number }}">Next</a>
-    <a href="?page={{ files.paginator.num_pages }}">Last</a>
-{% endif %}
+<hr>
 
-</div>
+<!-- Uploads Section -->
+<details open>
+    <summary><strong>Uploads</strong></summary>
 
-{% else %}
+    <div>
+        <span><strong>Total uploads:</strong> {{ total_files }}</span><br>
+        <span><strong>Total storage used:</strong> {{ total_size|filesize }}</span>
+    </div>
 
-<p>You haven't uploaded any files yet.</p>
+    <form method="get">
+        <input type="text" name="search" placeholder="Search by filename..." value="{{ request.GET.search }}">
+        <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+        <button type="submit">Search</button>
+    </form>
 
-{% endif %}
+    <br>
+
+    {% if files %}
+    <table border="1">
+        <tr>
+            <th><a href="?sort=upload_id">Upload ID</a></th>
+            <th><a href="?sort=original_filename">Filename</a></th>
+            <th><a href="?sort=file_size">Size</a></th>
+            <th><a href="?sort=uploaded_at">Uploaded (UTC)</a></th>
+            <th>Uploaded by</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for file in files %}
+        <tr>
+            <td>{{ file.upload_id }}</td>
+            <td>{{ file.original_filename }}</td>
+            <td>{{ file.file_size|filesize }}</td>
+            <td>{{ file.uploaded_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ file.user.username }}</td>
+            <td>
+                <form method="post" action="{% url 'dashboard:delete_file' file.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete this file?');">
+                        Delete
+                    </button>
+                </form>
+                <a href="{% url 'dashboard:download_file' file.id %}">Download</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Pagination -->
+    <div style="margin-top:20px;">
+        {% if files.has_previous %}
+        <a href="?page=1&sort={{ request.GET.sort }}">First</a>
+        <a href="?page={{ files.previous_page_number }}&sort={{ request.GET.sort }}">Previous</a>
+        {% endif %}
+
+        Page {{ files.number }} of {{ files.paginator.num_pages }}
+
+        {% if files.has_next %}
+        <a href="?page={{ files.next_page_number }}&sort={{ request.GET.sort }}">Next</a>
+        <a href="?page={{ files.paginator.num_pages }}&sort={{ request.GET.sort }}">Last</a>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <p>You haven't uploaded any files yet.</p>
+    {% endif %}
+
+</details>
 
 {% endblock %}

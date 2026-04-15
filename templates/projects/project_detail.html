@@ -2,7 +2,7 @@
 {% block content %}
 
 
-<h2>Project: {{ project.project_id }}</h2>
+<h4>Project: {{ project.project_id }}</h4>
 <p>Status: {{ project.status }}</p>
 
 {% if project.error_message %}
@@ -10,8 +10,25 @@
 {% endif %}
 
 {% if result %}
-  <h3>Result</h3>
-  <pre>{{ result.result_json }}</pre>
+  <h4>Result</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          {% for col in result.result_json.0.keys %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in result.result_json %}
+          <tr>
+            {% for value in row.values %}
+              <td>{{ value }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% else %}
   <p>No result yet.</p>
 {% endif %}

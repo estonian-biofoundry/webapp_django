@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Home — StrainQC{% endblock %}
+{% block title %}Home — Digibio{% endblock %}
 
 {% block content %}
 
-<h2>Welcome to StrainQC</h2>
+<h2>Welcome Digibio Tools</h2>
 
 <p>
-    A platform for managing and analyzing microbial strain sequencing data.
+    A platform for managing and analyzing biological data.
 </p>
 
 <hr>
@@ -15,18 +15,19 @@
 <h3>Features</h3>
 
 <ul>
-    <li>Upload sequencing files securely</li>
-    <li>Organize projects and samples</li>
+    <li>Dose response curve: identifying optimal timepoint for analysis</li>
+    <li>Organize projects and samples data</li>
     <li>Track processing history</li>
-    <li>Generate quality reports</li>
+    <li>Visualize data with interactive plots (not implemented yet)</li>
+    <li>sequence analysis (not implemented yet)</li>
 </ul>
 
 <br>
 
 {% if not user.is_authenticated %}
-    <a class="btn btn-primary" href="{% url 'accounts:signup' %}">Get Started</a>
+<a class="btn btn-primary" href="{% url 'accounts:signup' %}">Get Started</a>
 {% else %}
-    <a class="btn btn-success" href="{% url 'dashboard:dashboard' %}">Go to Dashboard</a>
+<a class="btn btn-success" href="{% url 'dashboard:dashboard' %}">Go to Dashboard</a>
 {% endif %}
 
 {% endblock %}

@@ -176,3 +176,15 @@ now run celery worker
 celery -A core worker -l info
 
 , now all your functions which have the proerty shared_task and .delay() will go to scheduler to run async instead of blocking the workflow
+
+
+### PART2
+Now we move to django rest
+- pip install djangorestframework
+- register it to your core/settings.py in INSTALLED_APPS
+
+
+##### Step 2: The "Concept" Shift (Forms vs. Serializers)
+In your `accounts/forms.py`, you have a `CustomUserCreationForm`. 
+- **What the Form does:** It takes incoming data, validates that the email is correct and the passwords match, and then saves it to the database. It also handles the HTML display.
+- **What a Serializer does:** In an API world, there is no HTML. So, a **Serializer** is basically a **Form without the HTML part**.

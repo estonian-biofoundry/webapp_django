@@ -37,34 +37,47 @@ def get_user_file(user, file_id):
 # Returns (cleaned_data, error_string) — error is None on success
 # ---------------------------------------------------------------------------
 
-def handle_timepoint(request):
-    """Validate and extract Timepoint pipeline POST data."""
-    file_id = request.POST.get("timepoint_file")
-    group_fields = request.POST.get("group_fields")
-    dose_field = request.POST.get("dose_field")
-    od_field = request.POST.get("od_field")
-    time_field = request.POST.get("time_field")
+# def handle_timepoint(request):
+#     """Validate and extract Timepoint pipeline POST data."""
+#     file_id = request.POST.get("timepoint_file")
+#     group_fields = request.POST.get("group_fields")
+#     dose_field = request.POST.get("dose_field")
+#     od_field = request.POST.get("od_field")
+#     time_field = request.POST.get("time_field")
 
-    try:
-        file = get_user_file(request.user, file_id)
-    except Exception:
-        return None, "Selected file is invalid or inaccessible."
+#     try:
+#         file = get_user_file(request.user, file_id)
+#     except Exception:
+#         return None, "Selected file is invalid or inaccessible."
 
-    if not file.original_filename.lower().endswith(".csv"):
-        return None, "Only CSV files are allowed for the Timepoint pipeline."
+#     if not file.original_filename.lower().endswith(".csv"):
+#         return None, "Only CSV files are allowed for the Timepoint pipeline."
 
-    if not all([group_fields, dose_field, od_field, time_field]):
-        return None, "Please fill in all required fields."
+#     if not all([group_fields, dose_field, od_field, time_field]):
+#         return None, "Please fill in all required fields."
 
-    cleaned_data = {
-        "file": file,
-        "group_fields": [f.strip() for f in group_fields.split(",")],
-        "dose_field": dose_field,
-        "od_field": od_field,
-        "time_field": time_field,
-    }
-    return cleaned_data, None
+#     cleaned_data = {
+#         "file": file,
+#         "group_fields": [f.strip() for f in group_fields.split(",")],
+#         "dose_field": dose_field,
+#         "od_field": od_field,
+#         "time_field": time_field,
+#     }
+#     return cleaned_data, None
 
+
+def validate_timepoint_logic(file_obj, config):
+    """
+    Pure logic: Checks if the file is a CSV and if config is complete.
+    """
+    if not file_obj.original_filename.lower().endswith(".csv"):
+        return False, "Only CSV files are allowed for the Timepoint pipeline."
+
+    required = ["group_fields", "dose_field", "od_field", "time_field"]
+    if not all(k in config for k in required):
+        return False, "Please fill in all required fields."
+
+    return True, None
 
 def handle_sequence(request):
     """Validate and extract Sequence pipeline POST data."""

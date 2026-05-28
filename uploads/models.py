@@ -1,7 +1,7 @@
 import secrets
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 
 # to generate unique upload ids
 def generate_upload_id():
@@ -42,6 +42,13 @@ class File(models.Model):
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
     md5 = models.CharField(max_length=64, null=True, blank=True)
+
+    def delete(self, *args, **kwargs):
+        if self.projects.exists():
+            raise ValidationError(
+                "Cannot delete file: it is used by one or more projects."
+            )
+        super().delete(*args, **kwargs)
 
     # this is for debugging purposes, it will return the upload_id when we print the object
     def __str__(self):

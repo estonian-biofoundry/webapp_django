@@ -10,6 +10,7 @@ from django.shortcuts import redirect, render
 from django.http import Http404, FileResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -92,9 +93,9 @@ def dashboard_view(request):
         projects = ProjectRun.objects.filter(user=request.user).prefetch_related("files")
 
     # 2. Get file names for project display
-    for project in projects:
-        project.file_names = ", ".join(f.original_filename for f in project.files.all())
-
+    projects = ProjectRun.objects.annotate(
+        file_names=StringAgg('files__original_filename', delimiter=', ')
+    )
     # 3. Identify "Locked" files (those associated with any project)
     # values_list returns a list of IDs; we turn it into a set for O(1) lookup speed
     locked_file_ids = set(

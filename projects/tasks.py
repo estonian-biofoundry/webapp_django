@@ -33,7 +33,7 @@ def run_timepoint(self, project_id):
         }
 
         # Simulate long-running task — remove in production
-        time.sleep(25)
+        # time.sleep(5)
 
         result_df = run_analysis_from_config(config)
 
@@ -43,16 +43,21 @@ def run_timepoint(self, project_id):
         )
 
         project.status = "SUCCESS"
-        notify_slack(project, status="success")
+        project.completed_at = timezone.now()
+        project.duration = project.completed_at - project.started_at
+        notify_slack(project, status="success")  # ✅ duration is set
 
     except Exception as e:
         project.status = "FAILED"
         project.error_message = str(e)
-        notify_slack(project, status="failed", error=e)
+        project.completed_at = timezone.now()
+        project.duration = project.completed_at - project.started_at
+        notify_slack(project, status="failed", error=e)  # ✅ duration is set here too
 
     finally:
-        project.completed_at = timezone.now()
-        if project.started_at:
+        if not project.completed_at:  # safety net
+            project.completed_at = timezone.now()
+        if project.started_at and not project.duration:
             project.duration = project.completed_at - project.started_at
         project.save()
         connection.close()

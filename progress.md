@@ -67,3 +67,16 @@ Views (dashboard/views.py):
 - delete_file_view — deletes a file if it is not attached to any project. Deletion triggers a post_delete signal that also removes the file from disk. Returns an error message if the file is in use. Superusers can delete any file; regular users can only delete their own.
 - download_file_view — streams a file back to the browser as an attachment. Superusers can download any file; regular users can only download their own.
 - delete_project_view — deletes a project and its associated results (cascades to TimepointResult). Blocked if the project is actively running (unless it is stuck). Only superuser can delete the projects. normal users cannot delete any project.
+
+
+
+
+If you want to be "done" with Simple Django, try to implement these three things in your current app:
+
+A Custom Middleware: Create one that logs the IP address of every user who attempts to delete a file.
+
+An Annotated Query: In your dashboard_view, instead of counting files in Python, use .annotate() to let PostgreSQL count how many files each project has in a single query.
+
+A Test Suite: Write a test that proves a non-superuser cannot delete someone else's file.
+
+Do you feel confident in your testing or ORM optimization skills, or should we dive into one of those first?

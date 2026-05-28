@@ -19,3 +19,6 @@ else:
 "
 
 echo "Initialization complete. Handing over to Supervisor..."
+
+# CRITICAL: This fires whatever is defined in the Dockerfile CMD instruction (Supervisor)!
+exec "$@"

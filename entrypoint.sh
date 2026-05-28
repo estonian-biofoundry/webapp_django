@@ -18,4 +18,4 @@ else:
     print('Superuser already exists, skipping.')
 "
 
-exec "$@"
+echo "Initialization complete. Handing over to Supervisor..."

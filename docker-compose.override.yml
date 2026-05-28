@@ -1,0 +1,17 @@
+services:
+  web:
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - media_data:/app/media
+    environment:
+      ENV: dev
+      DEBUG: "True"
+
+  worker:
+    volumes:
+      - .:/app
+      - media_data:/app/media
+    environment:
+      ENV: dev
+      DEBUG: "True"

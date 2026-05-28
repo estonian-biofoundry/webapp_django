@@ -15,5 +15,14 @@ class FileAdmin(admin.ModelAdmin):
     search_fields = ("upload_id", "original_filename", "user__username")
     list_filter = ("status", "uploaded_at")
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            if obj.projects.exists():
+                raise ValidationError(
+                    f"Cannot delete {obj}: it is used by a project."
+                )
+        queryset.delete()
+
+
 
 admin.site.register(File, FileAdmin)

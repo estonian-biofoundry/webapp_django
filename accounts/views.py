@@ -1,3 +1,4 @@
+from django.contrib import messages
 from .forms import CustomUserCreationForm
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
@@ -16,6 +17,8 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            username = user.username  
+            messages.success(request, f"Account created for {username}!")
             return redirect("dashboard:dashboard")
     else:
         form = CustomUserCreationForm()
@@ -41,7 +44,9 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.info(request, "You have successfully logged out.")
     return redirect("accounts:login")
+
 
 
 #####################################################################################################################

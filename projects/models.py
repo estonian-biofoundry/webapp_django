@@ -39,6 +39,11 @@ class ProjectRun(models.Model):
     error_message = models.TextField(null=True, blank=True)
     celery_task_id = models.CharField(max_length=255, blank=True, null=True)
 
+
+    def __repr__(self):
+        # This looks exactly like the code you'd type to make the object
+        return f"ProjectRun(id={self.id}, project_id='{self.project_id}', status='{self.status}')"
+
     def __str__(self):
         return self.project_id
 

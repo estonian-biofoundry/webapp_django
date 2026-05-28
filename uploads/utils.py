@@ -14,8 +14,6 @@ def calculate_md5(file_obj):
 
 ALLOWED_EXTENSIONS = [
     "csv",
-    "xlsx",
-    "xls",
     "fastq",
     "fastq.gz",
     "fq",
@@ -27,7 +25,7 @@ ALLOWED_EXTENSIONS = [
     "gb",
     "genbank",
 ]
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024  # 10 GB
 
 
 def get_file_extension(file_obj):

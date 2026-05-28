@@ -23,15 +23,14 @@ RUN adduser --disabled-password --no-create-home appuser && \
     chown -R appuser:appuser /app && \
     chmod +x /app/entrypoint.sh
 
-# Copy supervisor config to the correct system path
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Copy supervisor config to your writeable app directory
+COPY supervisord.conf /app/supervisord.conf
 
 USER appuser
 
 EXPOSE 8000
 
-# We use entrypoint only for handling one-time migrations/static collection on boot
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Launch supervisor to run both Gunicorn and Celery together forever
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Point directly to the app directory configuration file
+CMD ["supervisord", "-c", "/app/supervisord.conf"]

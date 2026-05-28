@@ -22,3 +22,9 @@ RUN adduser --disabled-password --no-create-home appuser && \
 USER appuser
 
 EXPOSE 8000
+
+# Tell the container to execute your entrypoint script first
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Tell the container the main production command to boot Django via Gunicorn
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:10000"]
